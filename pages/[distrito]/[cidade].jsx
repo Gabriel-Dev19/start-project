@@ -2,20 +2,24 @@ import axios from 'axios'
 import LayoutDefault from '../../layouts/LayoutDefault';
 import { formattedKebabCase } from '../../helpers/fonts'
 
-export default function Cidade({ response }) {
+export default function Cidade({ responseCidade, responseDistrito }) {
   return(
-    <LayoutDefault title={formattedKebabCase(response.cidade)}>
-      Nome da cidade: {response.cidade}
+    <LayoutDefault title={formattedKebabCase(responseCidade.cidade)}>
+      Nome do distrito: {JSON.stringify(responseDistrito.distrito)} <br />
+      Nome da cidade: {responseCidade.cidade}
     </LayoutDefault>
   )
 }
 
 export const getStaticProps = async ({params}) => {
-  const { data } = await axios.get(`http://localhost:3000/api/distritos/${params.distrito}/${params.cidade}`);
-  const response = data;
+  const distrito = await (await axios.get(`http://localhost:3000/api/distritos/${params.distrito}`)).data;
+  const cidades = await (await axios.get(`http://localhost:3000/api/distritos/${params.distrito}/${params.cidade}`)).data;
+  const responseCidade = cidades;
+  const responseDistrito = distrito;
   return {
     props: {
-      response,
+      responseCidade,
+      responseDistrito
     },
   };
 };
@@ -34,6 +38,7 @@ export const getStaticPaths = async () => {
       })
     )
   }).flat();
+
   return {
     paths,
     fallback: false,
